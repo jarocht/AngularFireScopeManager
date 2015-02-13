@@ -1,5 +1,7 @@
 # IDE Files #
 ###################
+*.sln
+*.suo
 *.config
 *SENSITIVE*
 

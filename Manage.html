@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="/bootstrap.css" />
         <div class="container-fluid">
             <div class="col-md-10 col-md-offset-1">
-                <div class="row" ng-repeat="engineer in engineerList | orderBy:'rank'">
+                <div class="row" ng-repeat="engineer in engineerList">
                     <div class="row"><h4>{{engineer.name}}</h4></div>
                     <div class="row text-left text-primary">
                         <div class="col-xs-1 col-md-1">Priority</div>
@@ -29,7 +29,7 @@
                             <option ng-repeat="type in types" ng-selected="type.$value == entry.typeText">{{type.$value}}</option>
                         </select>
                         <input class="col-xs-2 col-md-2 btn-primary" ng-model="entry.engagementManager" ng-change="updateRecord(engineerList.indexOf(engineer), entry)" />
-                        <input class="col-xs-1 col-md-1 btn-warning" ng-model="entry.hours" ng-model-options="{ updateOn: 'blur' }" ng-change="updateRecordHours(engineerList.indexOf(engineer), entry)">
+                        <input class="col-xs-1 col-md-1 btn-warning" ng-model="entry.hours" ng-model-options="{ updateOn: 'blur' }" ng-change="updateRecordHours(engineerList.indexOf(engineer))">
                         <input class="col-xs-1 col-md-1 btn-info" ng-model="entry.forecast" disabled>
                         <button class="col-xs-1 col-md-1 btn-danger" ng-click="recordsList[engineerList.indexOf(engineer)].$remove(entry)">Delete</button>
                     </div>
@@ -121,7 +121,6 @@
                     entry.typeNumber = parseInt(entry.typeNumber);
                     entry.hours = parseFloat(entry.hours);
                     entry.forecast = parseFloat(entry.forecast);
-
 
                     $scope.recordsList[engineerNum].$save(entry);
                 }

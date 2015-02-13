@@ -20,7 +20,7 @@
                         <div class="col-xs-1 col-md-1">Hours</div>
                         <div class="col-xs-1 col-md-1">Forecast</div>
                     </div>
-                    <div class="row text-left" ng-repeat="entry in recordsList[$index] | orderBy:'priority'">
+                    <div class="row text-left" ng-repeat="entry in recordsList[engineerList.indexOf(engineer)] | orderBy:'priority'">
                         <div class="col-xs-1 col-md-1">{{entry.priority}}</div>
                         <div class="col-xs-2 col-md-2">{{entry.customerName}}</div>
                         <div class="col-xs-1 col-md-1">{{entry.gearsId}}</div>
