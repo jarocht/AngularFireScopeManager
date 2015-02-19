@@ -59,7 +59,8 @@ For this project that structure is as follows:
     * priority: 5
     * typeNumber: 1
     * typeText: "New Customer"
-    
+
+You will not need to actually create the record entries as the applet does that for you.
 #### Authentication
 You will also need an authentication key to keep your data protected.
 https://www.firebase.com/docs/web/guide/login/anonymous.html
