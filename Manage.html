@@ -31,7 +31,7 @@
                         <input class="col-xs-2 col-md-2 btn-primary" ng-model="entry.engagementManager" ng-change="updateRecord(engineerList.indexOf(engineer), entry)" />
                         <input class="col-xs-1 col-md-1 btn-warning" ng-model="entry.hours" ng-model-options="{ updateOn: 'blur' }" ng-change="updateRecordHours(engineerList.indexOf(engineer))">
                         <input class="col-xs-1 col-md-1 btn-info" ng-model="entry.forecast" disabled>
-                        <button class="col-xs-1 col-md-1 btn-danger" ng-click="recordsList[engineerList.indexOf(engineer)].$remove(entry)">Delete</button>
+                        <button class="col-xs-1 col-md-1 btn-danger" ng-click="removeRecord(engineer, entry)">Delete</button>
                     </div>
                     <br />
                 </div>
@@ -99,9 +99,24 @@
                 $scope.addRecord = function (engineerNum, priority, customerName, gid, typeN, typeT, em, hours) {
                     $scope.recordsList[engineerNum].$add({ priority: parseInt(priority), customerName: customerName, gearsId: gid, typeNumber: parseInt(typeN), typeText: typeT.$value, engagementManager: em, hours: parseInt(hours), forecast: 0 })
                         .then(function (ref) {
-                            $scope.updateRecordPriority(engineerNum, $scope.recordsList[engineerNum].$getRecord(ref.key()));
+                            setTimeout(function() {
+                                $scope.updateRecordPriority(engineerNum, $scope.recordsList[engineerNum].$getRecord(ref.key()));
+                            }, 500);
                         });
                     clearForm();
+                }
+
+                $scope.removeRecord = function (engineer, entry) {
+                    var p = entry.priority;
+                    var engineerNum = $scope.engineerList.indexOf(engineer);
+                    $scope.recordsList[engineerNum].$remove(entry).then(function() {
+                        var index = findNextHigherPriorityIndex(engineerNum, p);
+                        while (index != -1) {
+                            p = $scope.recordsList[engineerNum][index].priority--;
+                            $scope.recordsList[engineerNum].$save(index);
+                            index = findNextHigherPriorityIndex(engineerNum, p);
+                        }
+                    });
                 }
 
                 function clearForm() {
@@ -138,7 +153,7 @@
 
                 function getRecordForecast(engineerNum, entry) {
                     var hours = scopes[engineerNum].hours;
-                    var index = findLowerPriority(engineerNum, entry.priority, entry.$id);
+                    var index = findNextLowerPriorityIndex(engineerNum, entry.priority, entry.$id);
                     var forecast = 0;
                     if (entry.hours == "") {
                         hours = 0;
@@ -175,14 +190,32 @@
                     return -1;
                 };
 
-                function findLowerPriority(engineerNum, p, id) {
+                function findNextLowerPriorityIndex(engineerNum, p) {
                     var index = -1;
-                    var priority = p - 1;
-                    while (priority > -1) {
-                        index = findPriority(engineerNum, priority, id);
-                        if (index != -1)
-                            return index;
-                        priority--;
+                    var priority = -1;
+                    for (var i = 0; i < $scope.recordsList[engineerNum].length; i++) {
+                        var tp = $scope.recordsList[engineerNum][i].priority;
+                        if (tp < p) {
+                            if (p - tp < p - priority) {
+                                priority = tp;
+                                index = i;
+                            }
+                        }
+                    }
+                    return index;
+                }
+
+                function findNextHigherPriorityIndex(engineerNum, p) {
+                    var index = -1;
+                    var priority = 999999;
+                    for (var i = 0; i < $scope.recordsList[engineerNum].length; i++) {
+                        var tp = $scope.recordsList[engineerNum][i].priority;
+                        if (tp > p) {
+                            if (tp - p < priority - p) {
+                                priority = tp;
+                                index = i;
+                            }
+                        }
                     }
                     return index;
                 }
@@ -191,6 +224,16 @@
                     var p = -1;
                     for (var i = 0; i < $scope.recordsList[engineerNum].length; i++) {
                         if ($scope.recordsList[engineerNum][i].priority > p) {
+                            p = $scope.recordsList[engineerNum][i].priority;
+                        }
+                    }
+                    return p;
+                }
+
+                function findLowestPriorityValue(engineerNum) {
+                    var p = $scope.recordsList[engineerNum][0].priority;
+                    for (var i = 0; i < scopes.recordsList[engineerNum].length; i++) {
+                        if ($scope.recordsList[engineerNum][i].priority < p) {
                             p = $scope.recordsList[engineerNum][i].priority;
                         }
                     }
