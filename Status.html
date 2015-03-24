@@ -67,7 +67,12 @@
                             var rank = scopes[index].rank;
                             var p = findGreatestPriorityValue(index);
                             var loc = findPriority(index, p, -1);
-                            var forecast = $scope.recordsList[index][loc].forecast;
+                            var forecast;
+                            try {
+                                forecast = $scope.recordsList[index][loc].forecast;
+                            } catch (e) {
+                                forecast = 0;
+                            } 
                             $scope.engineers.push({ rank: rank, name: name, title: title, forecast: forecast });
                         }, function (error) {
                             console.log(error);
